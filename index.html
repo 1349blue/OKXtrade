@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OKX Coin Trading</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Layout 1: API key input -->
+    <div id="layout1">
+        <input type="text" id="apiKey" placeholder="Enter API Key">
+        <input type="text" id="secretKey" placeholder="Enter Secret Key">
+        <input type="text" id="passphrase" placeholder="Enter Passphrase">
+        <button id="saveApiKey">Save</button>
+    </div>
+
+    <!-- Layout 2: Order Table -->
+    <div id="layout2">
+		<h2>Order table</h2>
+        <table id="orderTable">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>instId</th>
+                    <th>tdMode</th>
+                    <th>Side</th>
+                    <th>OrdType</th>
+                    <th>Sz</th>
+                    <th>Del</th>
+                    <th>Act</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data rows will be added here -->
+            </tbody>
+        </table>
+        <button id="addOrderRow">Add</button>
+        <button id="actAll">Act All</button>
+    </div>
+
+    <!-- Layout 3: Target Price Table -->
+    <div id="layout3">
+		<h2>Condition table</h2>
+        <table id="targetTable">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Name</th>
+                    <th>Current Price</th>
+					<th>Logic</th>
+                    <th>Target Price</th>
+                    <th>Percent Change</th>
+                    <th>Del</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data rows will be added here -->
+            </tbody>
+        </table>
+        <button id="addTargetRow">Add</button>
+    </div>
+
+    <!-- Layout 4: Wallet Information -->	
+	<div id="layout4">
+        <h2>Wallet Information</h2>
+        <button id="fetchWalletButton">Fetch Wallet Info</button>
+		<button id="addAllOrder">Add all Order</button>
+        <table id="walletTable">
+            <thead>
+                <tr>
+                    <th>Currency</th>
+                    <th>Balance</th>
+                    <th>Add Order</th>
+                    <th>Add Condition</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+	
+    <script src="script.js"></script>
+</body>
+</html>
