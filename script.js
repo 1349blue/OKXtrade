@@ -25,6 +25,57 @@ document.addEventListener('DOMContentLoaded', function () {
         passphrase = document.getElementById('passphrase').value;
         showAlert('API keys saved successfully!');
     });
+	// Save data to a JSON file
+	document.getElementById('saveAsApiKey').addEventListener('click', () => {
+		const data = {
+			apiKey: apiKey,
+			secretKey: secretKey,
+			passphrase: passphrase
+		};
+
+		const jsonData = JSON.stringify(data, null, 2);
+		const blob = new Blob([jsonData], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+
+		// Create a temporary link to download the file
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'apiKeys_OKX.json';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+
+		URL.revokeObjectURL(url); // Release the URL
+		showAlert('Data saved to JSON file!');
+	});
+
+	// Load data from a JSON file
+	document.getElementById('loadApiKey').addEventListener('click', () => {
+		const fileInput = document.getElementById('fileInput');
+		fileInput.click(); // Simulate a click to open the file selector
+
+		fileInput.addEventListener('change', (event) => {
+			const file = event.target.files[0];
+
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					try {
+						const data = JSON.parse(e.target.result);
+						document.getElementById('apiKey').value = data.apiKey || '';
+						document.getElementById('secretKey').value = data.secretKey || '';
+						document.getElementById('passphrase').value = data.passphrase || '';
+
+						showAlert('Data loaded successfully!');
+					} catch (err) {
+						showAlert('Failed to load file. Please check the file format.');
+					}
+				};
+				reader.readAsText(file);
+			}
+		});
+	});
+
 
     // Function to fetch wallet information from OKX
     async function fetchWalletInfo() {
@@ -191,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			// Tạo URL tải về từ Blob
 			const link = document.createElement('a');
 			link.href = URL.createObjectURL(blob);
-			link.download = 'data_Order.json'; // Tên tệp sẽ được tải về
+			link.download = 'order_OKX.json'; // Tên tệp sẽ được tải về
 
 			// Mô phỏng click vào liên kết để tải về tệp
 			link.click();
@@ -393,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		// Tạo URL tải về từ Blob
 		const link = document.createElement('a');
 		link.href = URL.createObjectURL(blob);
-		link.download = 'data_Target.json'; // Tên tệp sẽ được tải về
+		link.download = 'target_OKX.json'; // Tên tệp sẽ được tải về
 
 		// Mô phỏng click vào liên kết để tải về tệp
 		link.click();
