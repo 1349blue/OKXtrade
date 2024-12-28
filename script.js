@@ -156,11 +156,94 @@ document.addEventListener('DOMContentLoaded', function () {
             <td><input type="text" value="cash"></td>
             <td><input type="text" value="buy"></td>
             <td><input type="text" value="market"></td>
-            <td><input type="number" value="0.01"></td>
+            <td><input type="number" value="0"></td>
             <td><button class="deleteRow">Del</button></td>
             <td><button class="activateOrder">Act</button></td>
         `;
     });
+	// Save as lưu dữ liệu bảng Order
+		document.getElementById('saveAsOrderTable').addEventListener('click', () => {
+			const table = document.getElementById('orderTable');
+			const tbody = table.querySelector('tbody');
+			const tableData = [];
+
+			// Duyệt qua tất cả các hàng trong bảng và lấy dữ liệu từ các ô input
+			for (let row of tbody.rows) {
+				const rowData = {};
+				
+				// Lấy giá trị từ các ô input trong mỗi hàng
+				rowData['Order'] = row.cells[0].querySelector('input').value; // Lấy giá trị từ ô input Order
+				rowData['instId'] = row.cells[1].querySelector('input').value; // Lấy giá trị từ ô input instId
+				rowData['tdMode'] = row.cells[2].querySelector('input').value; // Lấy giá trị từ ô input tdMode
+				rowData['Side'] = row.cells[3].querySelector('input').value; // Lấy giá trị từ ô input Side
+				rowData['OrdType'] = row.cells[4].querySelector('input').value; // Lấy giá trị từ ô input OrdType
+				rowData['Sz'] = row.cells[5].querySelector('input').value; // Lấy giá trị từ ô input Sz
+
+				tableData.push(rowData); // Thêm dữ liệu hàng vào mảng
+			}
+
+			// Chuyển dữ liệu thành JSON
+			const jsonData = JSON.stringify(tableData, null, 2);
+
+			// Tạo một Blob từ dữ liệu JSON
+			const blob = new Blob([jsonData], { type: 'application/json' });
+
+			// Tạo URL tải về từ Blob
+			const link = document.createElement('a');
+			link.href = URL.createObjectURL(blob);
+			link.download = 'data_Order.json'; // Tên tệp sẽ được tải về
+
+			// Mô phỏng click vào liên kết để tải về tệp
+			link.click();
+		});
+
+
+		// Load dữ liệu từ file JSON vào bảng
+		document.getElementById('loadOrderTable').addEventListener('change', (event) => {
+			const file = event.target.files[0];
+			if (!file) {
+				alert('No file selected!');
+				return;
+			}
+
+			const reader = new FileReader();
+
+			reader.onload = (e) => {
+				try {
+					const data = JSON.parse(e.target.result);
+
+					// Kiểm tra dữ liệu có phải là mảng không
+					if (!Array.isArray(data)) {
+						alert('Invalid file format. Expected an array of objects.');
+						return;
+					}
+
+					const tbody = document.getElementById('orderTable').getElementsByTagName('tbody')[0];
+					tbody.innerHTML = ''; // Xóa dữ liệu hiện tại trong bảng
+
+					// Duyệt qua từng hàng trong dữ liệu
+					data.forEach((row) => {
+						const newRow = tbody.insertRow();
+
+						// Tạo các ô dữ liệu với input
+						newRow.innerHTML = `
+							<td><input type="number" value="${row.Order || 0}"></td>
+							<td><input type="text" value="${row.instId || ''}"></td>
+							<td><input type="text" value="${row.tdMode || ''}"></td>
+							<td><input type="text" value="${row.Side || ''}"></td>
+							<td><input type="text" value="${row.OrdType || ''}"></td>
+							<td><input type="number" value="${row.Sz || 0}"></td>
+							<td><button class="deleteRow">Del</button></td>
+							<td><button class="activateOrder">Act</button></td>
+						`;
+					});
+				} catch (err) {
+					alert('Error loading file: ' + err.message);
+				}
+			};
+
+			reader.readAsText(file);
+		});
 
     // Function to delete rows in the order table
     document.getElementById('orderTable').addEventListener('click', (e) => {
@@ -273,13 +356,87 @@ document.addEventListener('DOMContentLoaded', function () {
         newRow.innerHTML = `
             <td><input type="number" value="-1"></td>
             <td><input type="text" value="BTCUSDT"></td>
-            <td><span class="currentPrice">0</span></td>
+            <td><span class="currentPrice">1</span></td>
             <td><input type="text" value="<"></td>
-            <td><input type="number" value="20000"></td>
+            <td><input type="number" value="0"></td>
             <td><span class="percentChange">0</span></td>
             <td><button class="deleteRow">Del</button></td>
         `;
     });
+	//Lưu Dữ Liệu từ Bảng targetTable vào File JSON
+		document.getElementById('saveAsTargetTable').addEventListener('click', () => {
+		const table = document.getElementById('targetTable');
+		const tbody = table.querySelector('tbody');
+		const tableData = [];
+
+		// Duyệt qua tất cả các hàng trong bảng và lấy dữ liệu từ các ô input và span
+		for (let row of tbody.rows) {
+			const rowData = {};
+
+			// Lấy giá trị từ các ô input và span trong mỗi hàng
+			rowData['Order'] = row.cells[0].querySelector('input').value; // Lấy giá trị từ ô input Order
+			rowData['instId'] = row.cells[1].querySelector('input').value; // Lấy giá trị từ ô input instId
+			rowData['currentPrice'] = row.cells[2].querySelector('.currentPrice').textContent; // Lấy giá trị từ span currentPrice
+			rowData['operator'] = row.cells[3].querySelector('input').value; // Lấy giá trị từ ô input operator
+			rowData['priceTarget'] = row.cells[4].querySelector('input').value; // Lấy giá trị từ ô input priceTarget
+			rowData['percentChange'] = row.cells[5].querySelector('.percentChange').textContent; // Lấy giá trị từ span percentChange
+
+			tableData.push(rowData); // Thêm dữ liệu hàng vào mảng
+		}
+
+		// Chuyển dữ liệu thành JSON
+		const jsonData = JSON.stringify(tableData, null, 2);
+
+		// Tạo một Blob từ dữ liệu JSON
+		const blob = new Blob([jsonData], { type: 'application/json' });
+
+		// Tạo URL tải về từ Blob
+		const link = document.createElement('a');
+		link.href = URL.createObjectURL(blob);
+		link.download = 'data_Target.json'; // Tên tệp sẽ được tải về
+
+		// Mô phỏng click vào liên kết để tải về tệp
+		link.click();
+	});
+	//Load Dữ Liệu từ File JSON
+			document.getElementById('loadTargetTable').addEventListener('change', (e) => {
+			const file = e.target.files[0]; // Lấy tệp được chọn
+			if (!file) return; // Nếu không có tệp nào được chọn thì thoát
+
+			const reader = new FileReader();
+			reader.onload = function(event) {
+				try {
+					// Đọc dữ liệu từ tệp JSON
+					const data = JSON.parse(event.target.result);
+
+					const table = document.getElementById('targetTable');
+					const tbody = table.querySelector('tbody');
+
+					// Xóa hết các hàng hiện tại trong bảng
+					tbody.innerHTML = '';
+
+					// Thêm dữ liệu từ JSON vào bảng
+					data.forEach(rowData => {
+						const newRow = tbody.insertRow();
+
+						newRow.innerHTML = `
+							<td><input type="number" value="${rowData.Order || -1}"></td>
+							<td><input type="text" value="${rowData.instId || 'BTCUSDT'}"></td>
+							<td><span class="currentPrice">${rowData.currentPrice || 0}</span></td>
+							<td><input type="text" value="${rowData.operator || '<'}"></td>
+							<td><input type="number" value="${rowData.priceTarget || 20000}"></td>
+							<td><span class="percentChange">${rowData.percentChange || 0}</span></td>
+							<td><button class="deleteRow">Del</button></td>
+						`;
+					});
+
+				} catch (error) {
+					alert("Lỗi khi tải tệp JSON: " + error.message);
+				}
+			};
+			
+			reader.readAsText(file); // Đọc tệp dưới dạng văn bản
+		});
 
     // Fetch current price for a pair (simulated using Binance API)
     setInterval(() => {
