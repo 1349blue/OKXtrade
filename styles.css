@@ -93,7 +93,7 @@ th {
     border-radius: 4px;
     border: 1px solid #ccc;
     font-size: 12px;
-	width: 20%; /* Cho phép input co giãn theo chiều ngang của cột */
+	width: 15%; /* Cho phép input co giãn theo chiều ngang của cột */
     box-sizing: border-box; /* Đảm bảo padding và border không làm tăng chiều rộng */
 }
 .deleteRow {
