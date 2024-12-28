@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let apiKey = '';
     let secretKey = '';
     let passphrase = '';
+	
 	//đăng ký Service Worker:
 	if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -15,8 +16,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error('Service Worker registration failed:', error);
             });
     });
-}
-
+	}
+	
     // Function to save API keys
     document.getElementById('saveApiKey').addEventListener('click', () => {
         apiKey = document.getElementById('apiKey').value;
@@ -119,6 +120,8 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
     }
 	});
+	
+
 	// Function to Order rows in the order table
     document.getElementById('walletTable').addEventListener('click', (e) => {
     if (e.target.classList.contains('Order')) {
@@ -167,6 +170,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+	// xóa dữ liệu bảng
+	document.getElementById('clearOrderTable').addEventListener('click', () => {
+		document.getElementById('orderTable').querySelector('tbody').innerHTML = '';
+	});
+	document.getElementById('clearTargetTable').addEventListener('click', () => {
+		document.getElementById('targetTable').querySelector('tbody').innerHTML = '';
+	});
     // Function to activate all orders in the order table
     document.getElementById('actAll').addEventListener('click', () => {
         const rows = document.querySelectorAll('#orderTable tbody tr');
@@ -208,12 +218,54 @@ document.addEventListener('DOMContentLoaded', function () {
             const result = await response.json();
             if (response.ok) {
 				showAlert("Đặt lệnh thành công: " + row.cells[1].querySelector('input').value);
+				thongBaoOrder();
             } else {
                 showAlert("Error executing trade: " + result.message);  // Show error if trade execution fails
             }
         }
     });
+	// tiếng còi báo động đặt lệnh thành công
+		function thongBaoOrder() {
+				if (window.getComputedStyle(row).backgroundColor !== "rgb(255, 255, 225)") {
+					// Tạo âm thanh còi báo bằng Web Audio API
+					const context = new (window.AudioContext || window.webkitAudioContext)();
 
+					// Tạo nguồn âm thanh
+					const oscillator = context.createOscillator();
+					const gainNode = context.createGain();
+
+					// Kết nối các node
+					oscillator.connect(gainNode);
+					gainNode.connect(context.destination);
+
+					// Kiểu sóng sine tạo tiếng còi êm hơn
+					oscillator.type = 'sine';
+
+					// Bắt đầu thay đổi tần số để tạo hiệu ứng tiếng còi
+					const startTime = context.currentTime;
+					oscillator.frequency.setValueAtTime(400, startTime); // Tần số ban đầu
+					oscillator.frequency.linearRampToValueAtTime(1000, startTime + 0.5); // Tăng lên 1000 Hz trong 0.5 giây
+					oscillator.frequency.linearRampToValueAtTime(400, startTime + 1); // Giảm lại về 400 Hz trong 0.5 giây tiếp theo
+
+					// Lặp lại hiệu ứng còi
+					const loopDuration = 1; // Thời gian một chu kỳ
+					const playDuration = 3; // Thời gian phát còi (3 giây)
+					for (let i = 1; i < playDuration / loopDuration; i++) {
+						oscillator.frequency.setValueAtTime(400, startTime + i * loopDuration);
+						oscillator.frequency.linearRampToValueAtTime(1000, startTime + i * loopDuration + 0.5);
+						oscillator.frequency.linearRampToValueAtTime(400, startTime + i * loopDuration + 1);
+					}
+
+					// Bắt đầu phát
+					oscillator.start(startTime);
+					oscillator.stop(startTime + playDuration); // Dừng sau 3 giây
+
+					// Tắt âm lượng dần khi kết thúc
+					gainNode.gain.setValueAtTime(1, startTime);
+					gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + playDuration);
+
+				}
+			}
     // Function to add rows in the target price table (Layout 3)
     document.getElementById('addTargetRow').addEventListener('click', () => {
         const table = document.getElementById('targetTable').getElementsByTagName('tbody')[0];
@@ -302,10 +354,59 @@ document.addEventListener('DOMContentLoaded', function () {
 			
 			if (inputElement) {
 				inputElement.value = -2;
+				thongBaoTaget();
 			}
         }
     });
 }, 1000);
+// thông báo thảo điều kiện
+			function thongBaoTaget() {
+			// Tạo âm thanh còi báo bằng Web Audio API
+			const context = new (window.AudioContext || window.webkitAudioContext)();
+
+			// Tạo nguồn âm thanh
+			const oscillator = context.createOscillator();
+			const gainNode = context.createGain();
+
+			// Kết nối các node
+			oscillator.connect(gainNode);
+			gainNode.connect(context.destination);
+
+			// Kiểu sóng tạo âm thanh (square hoặc sine để tạo hiệu ứng thú vị hơn)
+			oscillator.type = 'sine';
+
+			// Tần số cao và thấp cho tiếng còi
+			const lowFrequency = 600;
+			const highFrequency = 1200;
+
+			// Thời gian bắt đầu
+			const startTime = context.currentTime;
+
+			// Chu kỳ thay đổi tần số (giống tiếng còi xe cảnh sát)
+			const cycleDuration = 0.4; // 0.4 giây mỗi chu kỳ (thay đổi giữa tần số cao và thấp)
+
+			// Thời gian phát âm thanh tổng cộng
+			const playDuration = 5; // 5 giây
+
+			// Tạo hiệu ứng còi xe cảnh sát bằng cách lặp qua các chu kỳ
+			for (let i = 0; i < playDuration / cycleDuration; i++) {
+				const currentCycleStart = startTime + i * cycleDuration;
+
+				// Tần số thấp trong nửa chu kỳ đầu
+				oscillator.frequency.setValueAtTime(lowFrequency, currentCycleStart);
+
+				// Tăng lên tần số cao trong nửa chu kỳ tiếp theo
+				oscillator.frequency.setValueAtTime(highFrequency, currentCycleStart + cycleDuration / 2);
+			}
+
+			// Tắt âm thanh sau khi hết thời gian phát
+			oscillator.start(startTime);
+			oscillator.stop(startTime + playDuration);
+
+			// Giảm âm lượng dần khi kết thúc
+			gainNode.gain.setValueAtTime(1, startTime);
+			gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + playDuration);
+		}
 	// thông báo
 	function showAlert(message) {
             const alertBox = document.createElement('div');
